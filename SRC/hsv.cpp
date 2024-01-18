@@ -4,6 +4,8 @@
 #include "../INC/Aurora/Mathematics/col32.h"
 #include "../INC/Aurora/Mathematics/math.h"
 #include "../INC/Aurora/Mathematics/Quality.h"
+#include <stdexcept>
+#include <string>
 
 namespace Aurora::Mathematics
 {
@@ -70,6 +72,54 @@ namespace Aurora::Mathematics
 	bool hsv::operator!=(hsv other) const
 	{
 		return !((*this) == other);
+	}
+
+	float hsv::operator[](int idx) const
+	{
+		if (idx == 0)
+		{
+			return h;
+		}
+		else if (idx == 1)
+		{
+			return s;
+		}
+		else if (idx == 2)
+		{
+			return v;
+		}
+		else if (idx == 3)
+		{
+			return a;
+		}
+		else
+		{
+			throw std::out_of_range("The requested position does not exist in the vector (" + std::to_string(idx) + ").");
+		}
+	}
+
+	float& hsv::operator[](int idx)
+	{
+		if (idx == 0)
+		{
+			return h;
+		}
+		else if (idx == 1)
+		{
+			return s;
+		}
+		else if (idx == 2)
+		{
+			return v;
+		}
+		else if (idx == 3)
+		{
+			return a;
+		}
+		else
+		{
+			throw std::out_of_range("The requested position does not exist in the vector (" + std::to_string(idx) + ").");
+		}
 	}
 
 	hsv::operator col() const

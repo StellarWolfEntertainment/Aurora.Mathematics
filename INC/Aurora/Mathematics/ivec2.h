@@ -576,6 +576,21 @@ namespace Aurora
              */
             bool operator !=(ivec2 other) const;
 
+
+            /**
+             * @brief Gets the element at the specified index in the vector.
+             * @param idx The index of the element to retrieve.
+             * @return The value at the specified index.
+             */
+            int operator[](int idx) const;
+
+            /**
+             * @brief Gets or sets the element at the specified index in the vector.
+             * @param idx The index of the element to modify.
+             * @return Reference to the element at the specified index.
+             */
+            int& operator[](int idx);
+
             /**
              * @brief Implicit conversion to a 3D vector.
              * @return The 3D vector with the x, and y components from this vector and the z component set to 0.

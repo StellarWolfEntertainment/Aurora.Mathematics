@@ -4078,6 +4078,20 @@ namespace Aurora
 		     */
 		    bool operator !=(vec4 other) const;
 
+            /**
+             * @brief Gets the element at the specified index in the vector.
+             * @param idx The index of the element to retrieve.
+             * @return The value at the specified index.
+             */
+            float operator[](int idx) const;
+
+            /**
+             * @brief Gets or sets the element at the specified index in the vector.
+             * @param idx The index of the element to modify.
+             * @return Reference to the element at the specified index.
+             */
+            float& operator[](int idx);
+
 		    /**
 		     * @brief Explicit conversion to a 2D vector.
 		     * @return The 2D vector with the x, and y components from this vector.

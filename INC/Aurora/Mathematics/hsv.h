@@ -144,6 +144,20 @@ namespace Aurora
             bool operator!=(hsv other) const;
 
             /**
+             * @brief Gets the element at the specified index in the color.
+             * @param idx The index of the element to retrieve.
+             * @return The value at the specified index.
+             */
+            float operator[](int idx) const;
+
+            /**
+             * @brief Gets or sets the element at the specified index in the color.
+             * @param idx The index of the element to modify.
+             * @return Reference to the element at the specified index.
+             */
+            float& operator[](int idx);
+
+            /**
              * @brief Implicit conversion operator to col.
              * @return The color represented as a col.
              */
@@ -154,6 +168,23 @@ namespace Aurora
              * @return The color represented as a col32.
              */
             operator col32() const;
+
+            // NOTE: The following comments are related to a potential 4th 'color' struct 'hsl',
+            // These merely denote the way by which a conversion can occur and are not a promise to
+            // actually implement this type.
+
+            // P.S. The equations below use:
+            // 'lowercase' letters to denote values from the original color
+            // 'UPPERCASE' letters to denote values for the resulting color
+            // In both cases the hue remains unchanged.
+
+            // To Convert HSV => HSL
+            // S = (l < 0.5f) ? (s / (l + s)) : (s / (2.0f - l - s))
+            // L = (v * (2.0f - s)) * 0.5f
+
+            // To Convert HSL => HSV
+            // S = (v > 0.0f) ? (2.0f * (1.0f - l / v.0f) / min(l, 1.0f - l)) : 0.0f
+            // V = l.0f + (s * min(l.0f, 1.0f - l) / 2.0f)
         };
     }
 }

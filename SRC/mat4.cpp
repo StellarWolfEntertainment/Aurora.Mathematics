@@ -4,12 +4,20 @@
 #include "../INC/Aurora/Mathematics/math.h"
 #include "../INC/Aurora/Mathematics/vec2.h"
 #include "../INC/Aurora/Mathematics/vec3.h"
+#include "../INC/Aurora/Mathematics/vec4.h"
+#include "../INC/Aurora/Mathematics/quat.h"
+#include "../INC/Aurora/Mathematics/ivec2.h"
 
 namespace Aurora::Mathematics
 {
     mat4 mat4::identity()
     {
-        return mat4(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+        return mat4(
+            1, 0, 0, 0,
+            0, 1, 0, 0,
+            0, 0, 1, 0,
+            0, 0, 0, 1
+        );
     }
 
     float mat4::determinant() const
@@ -36,11 +44,42 @@ namespace Aurora::Mathematics
                 );
     }
 
+    float mat4::trace() const
+    {
+        return m11() + m22() + m33() + m44();
+    }
+
+    vec4 mat4::row(int r) const
+    {
+        return vec4(operator()(r, 0), operator()(r, 1), operator()(r, 2), operator()(r, 3));
+    }
+
+    void mat4::row(int r, const vec4& value)
+    {
+        operator()(r, 0) = value.x;
+        operator()(r, 1) = value.y;
+        operator()(r, 2) = value.z;
+        operator()(r, 3) = value.w;
+    }
+
+    vec4 mat4::col(int c) const
+    {
+        return vec4(operator()(0, c), operator()(1, c), operator()(2, c), operator()(3, c));
+    }
+
+    void mat4::col(int c, const vec4& value)
+    {
+        operator()(0, c) = value.x;
+        operator()(1, c) = value.y;
+        operator()(2, c) = value.z;
+        operator()(3, c) = value.w;
+    }
+
     mat4::mat4() : matrix4x4<float>() {}
 
     mat4::mat4(float m11, float m12, float m13, float m14, float m21, float m22, float m23, float m24, float m31, float m32, float m33, float m34, float m41, float m42, float m43, float m44) : matrix4x4<float>(m11, m12, m13, m14, m21, m22, m23, m24, m31, m32, m33, m34, m41, m42, m43, m44) {}
 
-    bool mat4::approximately(mat4 value1, mat4 value2)
+    bool mat4::approximately(const mat4& value1, const mat4& value2)
     {
         for (int r = 0; r < rows(); r++)
         {
@@ -54,6 +93,99 @@ namespace Aurora::Mathematics
         }
 
         return true;
+    }
+
+    mat4 mat4::adjugate(mat4 value)
+    {
+        value.adjugate();
+        return value;
+    }
+
+    void mat4::adjugate()
+    {
+        float n11 = (m22() * (m33() * m44() - m34() * m43()) -
+            m23() * (m32() * m44() - m34() * m42()) +
+            m24() * (m32() * m43() - m33() * m42()));
+
+        float n12 = (m13() * (m32() * m44() - m34() * m42()) -
+            m12() * (m33() * m44() - m34() * m43()) +
+            m14() * (m33() * m42() - m32() * m43()));
+
+        float n13 = (m12() * (m23() * m44() - m24() * m43()) -
+            m13() * (m22() * m44() - m24() * m42()) +
+            m14() * (m22() * m43() - m23() * m42()));
+
+        float n14 = (m13() * (m22() * m34() - m23() * m32()) -
+            m12() * (m23() * m34() - m24() * m33()) +
+            m14() * (m23() * m32() - m22() * m33()));
+
+        float n21 = (m23() * (m31() * m44() - m34() * m41()) -
+            m21() * (m33() * m44() - m34() * m43()) +
+            m24() * (m33() * m41() - m31() * m43()));
+
+        float n22 = (m11() * (m33() * m44() - m34() * m43()) -
+            m13() * (m31() * m44() - m34() * m41()) +
+            m14() * (m31() * m43() - m33() * m41()));
+
+        float n23 = (m13() * (m21() * m44() - m24() * m41()) -
+            m11() * (m23() * m44() - m24() * m43()) +
+            m14() * (m23() * m41() - m21() * m43()));
+
+        float n24 = (m11() * (m23() * m34() - m24() * m33()) -
+            m13() * (m21() * m34() - m24() * m31()) +
+            m14() * (m21() * m33() - m23() * m31()));
+
+        float n31 = (m21() * (m32() * m44() - m34() * m42()) -
+            m22() * (m31() * m44() - m34() * m41()) +
+            m24() * (m31() * m42() - m32() * m41()));
+
+        float n32 = (m12() * (m31() * m44() - m34() * m41()) -
+            m11() * (m32() * m44() - m34() * m42()) +
+            m14() * (m32() * m41() - m31() * m42()));
+
+        float n33 = (m11() * (m22() * m44() - m24() * m42()) -
+            m12() * (m21() * m44() - m24() * m41()) +
+            m14() * (m21() * m42() - m22() * m41()));
+
+        float n34 = (m12() * (m21() * m34() - m22() * m33()) -
+            m11() * (m22() * m34() - m24() * m32()) +
+            m14() * (m22() * m33() - m23() * m32()));
+
+        float n41 = (m22() * (m31() * m43() - m33() * m41()) -
+            m21() * (m32() * m43() - m33() * m42()) +
+            m23() * (m32() * m41() - m31() * m42()));
+
+        float n42 = (m11() * (m32() * m43() - m33() * m42()) -
+            m12() * (m31() * m43() - m33() * m41()) +
+            m13() * (m31() * m42() - m32() * m41()));
+
+        float n43 = (m12() * (m21() * m43() - m23() * m41()) -
+            m11() * (m22() * m43() - m23() * m42()) +
+            m13() * (m22() * m41() - m21() * m42()));
+
+        float n44 = (m11() * (m22() * m33() - m23() * m32()) -
+            m12() * (m21() * m33() - m23() * m31()) +
+            m13() * (m21() * m32() - m22() * m31()));
+
+        m11() = n11;
+        m12() = n12;
+        m13() = n13;
+        m14() = n14;
+
+        m21() = n21;
+        m22() = n22;
+        m23() = n23;
+        m24() = n24;
+
+        m31() = n31;
+        m32() = n32;
+        m33() = n33;
+        m34() = n34;
+
+        m41() = n41;
+        m42() = n42;
+        m43() = n43;
+        m44() = n44;
     }
 
     mat4 mat4::invert(mat4 value)
@@ -137,25 +269,25 @@ namespace Aurora::Mathematics
             m12() * (m21() * m33() - m23() * m31()) +
             m13() * (m21() * m32() - m22() * m31())) * i;
 
-        m11(n11);
-        m12(n12);
-        m13(n13);
-        m14(n14);
+        m11() = n11;
+        m12() = n12;
+        m13() = n13;
+        m14() = n14;
 
-        m21(n21);
-        m22(n22);
-        m23(n23);
-        m24(n24);
+        m21() = n21;
+        m22() = n22;
+        m23() = n23;
+        m24() = n24;
 
-        m31(n31);
-        m32(n32);
-        m33(n33);
-        m34(n34);
+        m31() = n31;
+        m32() = n32;
+        m33() = n33;
+        m34() = n34;
 
-        m41(n41);
-        m42(n42);
-        m43(n43);
-        m44(n44);
+        m41() = n41;
+        m42() = n42;
+        m43() = n43;
+        m44() = n44;
     }
 
     mat4 mat4::transpose(mat4 value)
@@ -174,7 +306,7 @@ namespace Aurora::Mathematics
         }
     }
 
-    mat4 mat4::createTranslation(vec3 position)
+    mat4 mat4::createTranslation(const vec3& position)
     {
         mat4 mat = identity();
         mat(3, 0) = position.x;
@@ -183,7 +315,7 @@ namespace Aurora::Mathematics
         return mat;
     }
 
-    mat4 mat4::createScale(vec3 scale)
+    mat4 mat4::createScale(const vec3& scale)
     {
         mat4 mat = identity();
         mat(0, 0) = scale.x;
@@ -192,16 +324,32 @@ namespace Aurora::Mathematics
         return mat;
     }
 
-    mat4 mat4::createRotation(vec3 rotation)
+    mat4 mat4::createRotation(const vec3& rotation)
     {
-        mat4 rotX = { 1, 0, 0, 0, 0, cos(rotation.x), -sin(rotation.y), 0, 0, sin(rotation.x), cos(rotation.x), 0, 0, 0, 0, 1 };
-        mat4 rotY = { cos(rotation.y), 0, sin(rotation.y), 0, 0, 1, 0, 0, -sin(rotation.y), 0, cos(rotation.x), 0, 0, 0, 0, 1 };
-        mat4 rotZ = { cos(rotation.z), -sin(rotation.z), 0, 0, sin(rotation.z), cos(rotation.z), 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 };
-
-        return rotX * rotY * rotZ;
+        return createRotation(quat(rotation));
     }
 
-    mat4 mat4::createTransform(vec3 translation, vec3 rotation, vec3 scaling)
+    mat4 mat4::createRotation(const quat& rotation)
+    {
+        float xx = rotation.x * rotation.x;
+        float yy = rotation.y * rotation.y;
+        float zz = rotation.z * rotation.z;
+        float xy = rotation.x * rotation.y;
+        float xz = rotation.x * rotation.z;
+        float yz = rotation.y * rotation.z;
+        float wx = rotation.w * rotation.x;
+        float wy = rotation.w * rotation.y;
+        float wz = rotation.w * rotation.z;
+
+        return {
+            1.0f - (2.0f * (yy + zz)), 2.0f * (xy - wz), 2.0f * (xz + wy), 0.0f,
+            2.0f * (xy * wz), 1.0f - (2.0f * (xx + zz)), 2.0f * (yz - wx), 0.0f,
+            2.0f * (xz - wy), 2.0f * (yz + wx), 1.0f - (2.0f * (xx + yy)), 0.0f,
+            0.0f, 0.0f, 0.0f, 1.0f
+        };
+    }
+
+    mat4 mat4::createTransform(const vec3& translation, const vec3& rotation, const vec3& scaling)
     {
         mat4 t = createTranslation(translation);
         mat4 s = createScale(scaling);
@@ -210,26 +358,33 @@ namespace Aurora::Mathematics
         return t * s * r;
     }
 
-    mat4 mat4::createPerspective(float fov, float aspectRatio, float nearClip, float farClip)
+    mat4 mat4::createPerspective(float fov, const ivec2& viewport, float nearClip, float farClip)
     {
+        float far = max(nearClip, farClip);
+        float near = min(nearClip, farClip);
+        float aspectRatio = ((float)viewport.x) / viewport.y;
         float thf = tan(fov * 0.5f);
-        float ri = 1.0f / (nearClip - farClip);
+        float ri = 1.0f / (near - far);
 
         return mat4(
             1.0f / (thf * aspectRatio), 0, 0, 0,
             0, 1.0f / thf, 0, 0,
-            0, 0, (nearClip + farClip) * ri, -1,
-            0, 0, 2.0f * nearClip * farClip * ri, 0
+            0, 0, (near + far) * ri, -1,
+            0, 0, 2.0f * near * far * ri, 0
         );
     }
 
-    mat4 mat4::createOrthographic(float scale, float aspectRatio, float nearClip, float farClip)
+    mat4 mat4::createOrthographic(float scale, const ivec2& viewport, float nearClip, float farClip)
     {
-        return createOrthographic(scale, aspectRatio, nearClip, farClip, vec2());
+        return createOrthographic(scale, viewport, nearClip, farClip, vec2());
     }
 
-    mat4 mat4::createOrthographic(float scale, float aspectRatio, float nearClip, float farClip, vec2 offset)
+    mat4 mat4::createOrthographic(float scale, const ivec2& viewport, float nearClip, float farClip, vec2 offset)
     {
+        float aspectRatio = ((float)viewport.x) / viewport.y;
+        float far = max(nearClip, farClip);
+        float near = min(nearClip, farClip);
+
         float halfHeight = scale * 0.5f;
         float halfWidth = halfHeight * aspectRatio;
 
@@ -238,10 +393,18 @@ namespace Aurora::Mathematics
         float top = halfHeight + offset.y;
         float bottom = -halfHeight + offset.y;
 
+        float rml = right - left;
+        float rpl = right + left;
+        float tmb = top - bottom;
+        float tpb = top + bottom;
+
+        float fmn = far - near;
+        float fpn = far + near;
+
         return mat4(
-            2.0f / (right - left), 0, 0, -(right + left) / (right - left),
-            0, 2.0f / (top - bottom), 0, -(top + bottom) / (top - bottom),
-            0, 0, -2.0f / (farClip - nearClip), -(farClip + nearClip) / (farClip - nearClip),
+            2.0f / rml, 0, 0, -rpl / rml,
+            0, 2.0f / tmb, 0, -tpb / tmb,
+            0, 0, -2.0f / fmn, -fpn / fmn,
             0, 0, 0, 1
         );
     }
@@ -271,14 +434,14 @@ namespace Aurora::Mathematics
         return result;
     }
 
-    mat4 mat4::operator-(mat4 other) const
+    mat4 mat4::operator-(const mat4& other) const
     {
         mat4 result = *this;
         result -= other;
         return result;
     }
 
-    mat4& mat4::operator-=(mat4 other)
+    mat4& mat4::operator-=(const mat4& other)
     {
         for (int r = 0; r < rows(); r++)
         {
@@ -296,14 +459,14 @@ namespace Aurora::Mathematics
         return *this;
     }
 
-    mat4 mat4::operator+(mat4 other) const
+    mat4 mat4::operator+(const mat4& other) const
     {
         mat4 result = *this;
         result += other;
         return result;
     }
 
-    mat4& mat4::operator+=(mat4 other)
+    mat4& mat4::operator+=(const mat4& other)
     {
         for (int r = 0; r < rows(); r++)
         {
@@ -316,14 +479,14 @@ namespace Aurora::Mathematics
         return *this;
     }
 
-    mat4 mat4::operator*(mat4 other) const
+    mat4 mat4::operator*(const mat4& other) const
     {
         mat4 result = *this;
         result *= other;
         return result;
     }
 
-    mat4& mat4::operator*=(mat4 other)
+    mat4& mat4::operator*=(const mat4& other)
     {
         mat4 result;
 
@@ -360,7 +523,7 @@ namespace Aurora::Mathematics
     }
 
 
-    mat4 operator*(float lhs, mat4 rhs)
+    mat4 operator*(float lhs, const mat4& rhs)
     {
         mat4 result = mat4();
 
@@ -375,14 +538,14 @@ namespace Aurora::Mathematics
         return result;
     }
 
-    mat4 mat4::operator/(mat4 other) const
+    mat4 mat4::operator/(const mat4& other) const
     {
         mat4 result = *this;
         result /= other;
         return result;
     }
 
-    mat4& mat4::operator/=(mat4 other)
+    mat4& mat4::operator/=(const mat4& other)
     {
         return *this *= invert(other);
     }
@@ -407,7 +570,7 @@ namespace Aurora::Mathematics
         return *this;
     }
 
-    mat4 operator/(float lhs, mat4 rhs)
+    mat4 operator/(float lhs, const mat4& rhs)
     {
         mat4 result = mat4();
 
@@ -422,7 +585,7 @@ namespace Aurora::Mathematics
         return result;
     }
 
-    bool mat4::operator==(mat4 other) const
+    bool mat4::operator==(const mat4& other) const
     {
         for (int r = 0; r < rows(); r++)
         {
@@ -438,7 +601,7 @@ namespace Aurora::Mathematics
         return true;
     }
 
-    bool mat4::operator!=(mat4 other) const
+    bool mat4::operator!=(const mat4& other) const
     {
         return !(*this == other);
     }

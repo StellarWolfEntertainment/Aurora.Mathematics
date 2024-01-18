@@ -9,6 +9,8 @@
 #include "../INC/Aurora/Mathematics/vec4.h"
 #include "../INC/Aurora/Mathematics/ivec2.h"
 #include "../INC/Aurora/Mathematics/ivec3.h"
+#include <stdexcept>
+#include <string>
 
 namespace Aurora::Mathematics
 {
@@ -4167,6 +4169,54 @@ namespace Aurora::Mathematics
     bool ivec4::operator!=(ivec4 other) const
     {
         return !(*this == other);
+    }
+
+    int ivec4::operator[](int idx) const
+    {
+        if (idx == 0)
+        {
+            return x;
+        }
+        else if (idx == 1)
+        {
+            return y;
+        }
+        else if (idx == 2)
+        {
+            return z;
+        }
+        else if (idx == 3)
+        {
+            return w;
+        }
+        else
+        {
+            throw std::out_of_range("The requested position does not exist in the vector (" + std::to_string(idx) + ").");
+        }
+    }
+
+    int& ivec4::operator[](int idx)
+    {
+        if (idx == 0)
+        {
+            return x;
+        }
+        else if (idx == 1)
+        {
+            return y;
+        }
+        else if (idx == 2)
+        {
+            return z;
+        }
+        else if (idx == 3)
+        {
+            return w;
+        }
+        else
+        {
+            throw std::out_of_range("The requested position does not exist in the vector (" + std::to_string(idx) + ").");
+        }
     }
 
     ivec4::operator ivec2() const

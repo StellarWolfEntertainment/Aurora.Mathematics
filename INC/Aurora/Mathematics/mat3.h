@@ -1,21 +1,22 @@
 /**
  * @file mat3.h
- * @brief Defines the mat3 struct, representing a 3x3 matrix with float elements.
+ * @brief Defines the mat3 struct, representing a 2x2 matrix with float elements.
  * @author Raistlin Wolfe
  */
 #pragma once
 
 #include "matrix.h"
+#include <map>
 
 namespace Aurora
 {
+
     namespace Mathematics
     {
-        struct vec2;
         struct angle;
-
+        struct vec3;
         /**
-         * @brief Represents a 3x3 floating-point matrix
+         * @brief Represents a 3x3 floating-point matrix.
          */
         struct mat3 : public matrix3x3<float>
         {
@@ -32,23 +33,57 @@ namespace Aurora
             float determinant() const;
 
             /**
+             * @brief Calculates the trace of the matrix.
+             * @return The trace of the matrix.
+             */
+            float trace() const;
+
+            /**
+             * @brief Gets the specified row from the matrix.
+             * @param row The index of the row to retrieve.
+             * @return The vector representing the specified row.
+             */
+            vec3 row(int row) const;
+
+            /**
+             * @brief Sets the specified row in the matrix.
+             * @param row The index of the row to set.
+             * @param value The vector to set as the new row.
+             */
+            void row(int row, const vec3& value);
+
+            /**
+             * @brief Gets the specified column from the matrix.
+             * @param col The index of the column to retrieve.
+             * @return The vector representing the specified column.
+             */
+            vec3 col(int col) const;
+
+            /**
+             * @brief Sets the specified column in the matrix.
+             * @param col The index of the column to set.
+             * @param value The vector to set as the new column.
+             */
+            void col(int col, const vec3& value);
+
+            /**
              * @brief Default constructor, initializes a zero matrix.
              */
             mat3();
 
             /**
-             * @brief Constructor. Initializes the 3x3 matrix with the provided values.
+             * @brief Constructor. Initializes the 2x2 matrix with the provided values.
              * @param m11 The value at position (1, 1).
-             * @param m12 The value at position (1, 2).
-             * @param m13 The value at position (1, 3).
              * @param m21 The value at position (2, 1).
-             * @param m22 The value at position (2, 2).
-             * @param m23 The value at position (2, 3).
              * @param m31 The value at position (3, 1).
+             * @param m12 The value at position (1, 2).
+             * @param m22 The value at position (2, 2).
              * @param m32 The value at position (3, 2).
+             * @param m13 The value at position (1, 3).
+             * @param m23 The value at position (2, 3).
              * @param m33 The value at position (3, 3).
              */
-            mat3(float m11, float m12, float m13, float m21, float m22, float m23, float m31, float m32, float m33);
+            mat3(float m11, float m21, float m31, float m12, float m22, float m32, float m13, float m23, float m33);
 
             /**
             * @brief Checks if two matrices are approximately equal.
@@ -56,7 +91,19 @@ namespace Aurora
             * @param value2 The second matrix for comparison.
             * @return True if the matrices are approximately equal, false otherwise.
             */
-            static bool approximately(mat3 value1, mat3 value2);
+            static bool approximately(const mat3& value1, const mat3& value2);
+
+            /**
+             * @brief Adjugates the matrix.
+             * @param value The matrix to be adjugated.
+             * @return The adjugated matrix.
+             */
+            static mat3 adjugate(mat3 value);
+
+            /**
+             * @brief Adjugates the current matrix.
+             */
+            void adjugate();
 
             /**
             * @brief Inverts the matrix.
@@ -87,14 +134,14 @@ namespace Aurora
              * @param position The translation vector.
              * @return The translation matrix.
              */
-            static mat3 createTranslation(vec2 position);
+            static mat3 createTranslation(const vec2& position);
 
             /**
              * @brief Creates a 3x3 scaling matrix based on the specified scale.
              * @param scale The scaling vector.
              * @return The scaling matrix.
              */
-            static mat3 createScale(vec2 scale);
+            static mat3 createScale(const vec2& scale);
 
             /**
              * @brief Creates a 3x3 rotation matrix based on the specified rotation angles.
@@ -108,7 +155,7 @@ namespace Aurora
              * @param rotation The rotation angle.
              * @return The rotation matrix.
              */
-            static mat3 createRotation(angle rotation);
+            static mat3 createRotation(const angle& rotation);
 
             /**
              * @brief Creates a 3x3 transformation matrix based on translation, rotation, and scaling vectors.
@@ -117,7 +164,7 @@ namespace Aurora
              * @param scaling The scaling vector.
              * @return The transformation matrix.
              */
-            static mat3 createTransform(vec2 translation, float rotation, vec2 scaling);
+            static mat3 createTransform(const vec2& translation, float rotation, const vec2& scaling);
 
             /**
              * @brief Creates a 3x3 transformation matrix based on translation, rotation, and scaling vectors.
@@ -126,7 +173,7 @@ namespace Aurora
              * @param scaling The scaling vector.
              * @return The transformation matrix.
              */
-            static mat3 createTransform(vec2 translation, angle rotation, vec2 scaling);
+            static mat3 createTransform(const vec2& translation, const angle& rotation, const vec2& scaling);
 
             /**
              * Creates an orthographic projection matrix for a 2D space.
@@ -145,7 +192,7 @@ namespace Aurora
              * @param offset The offset of the projection, default is vec2::zero().
              * @return The orthographic projection matrix.
              */
-            static mat3 createOrthographic(float scale, float aspectRatio, vec2 offset);
+            static mat3 createOrthographic(float scale, float aspectRatio, const vec2& offset);
 
             /**
              * @brief Unary operator for matrix inversion.
@@ -170,14 +217,14 @@ namespace Aurora
              * @param other The matrix to subtract.
              * @return The result of the subtraction.
              */
-            mat3 operator -(mat3 other) const;
+            mat3 operator -(const mat3& other) const;
 
             /**
              * @brief Compound assignment operator for matrix subtraction.
              * @param other The matrix to subtract.
              * @return Reference to the modified matrix.
              */
-            mat3& operator -=(mat3 other);
+            mat3& operator -=(const mat3& other);
 
             /**
              * @brief Unary operator for identity (no change).
@@ -190,28 +237,28 @@ namespace Aurora
              * @param other The matrix to add.
              * @return The result of the addition.
              */
-            mat3 operator +(mat3 other) const;
+            mat3 operator +(const mat3& other) const;
 
             /**
              * @brief Compound assignment operator for matrix addition.
              * @param other The matrix to add.
              * @return Reference to the modified matrix.
              */
-            mat3& operator +=(mat3 other);
+            mat3& operator +=(const mat3& other);
 
             /**
              * @brief Binary operator for matrix multiplication.
              * @param other The matrix to multiply.
              * @return The result of the multiplication.
              */
-            mat3 operator *(mat3 other) const;
+            mat3 operator *(const mat3& other) const;
 
             /**
              * @brief Compound assignment operator for matrix multiplication.
              * @param other The matrix to multiply.
              * @return Reference to the modified matrix.
              */
-            mat3& operator *=(mat3 other);
+            mat3& operator *=(const mat3& other);
 
             /**
              * @brief Binary operator for scalar multiplication.
@@ -233,21 +280,21 @@ namespace Aurora
              * @param rhs The matrix to multiply.
              * @return The result of the multiplication.
              */
-            friend mat3 operator *(float lhs, mat3 rhs);
+            friend mat3 operator *(float lhs, const mat3& rhs);
 
             /**
              * @brief Binary operator for matrix division.
              * @param other The matrix to divide by.
              * @return The result of the division.
              */
-            mat3 operator /(mat3 other) const;
+            mat3 operator /(const mat3& other) const;
 
             /**
              * @brief Compound assignment operator for matrix division.
              * @param other The matrix to divide by.
              * @return Reference to the modified matrix.
              */
-            mat3& operator /= (mat3 other);
+            mat3& operator /= (const mat3& other);
 
             /**
              * @brief Binary operator for scalar division.
@@ -269,21 +316,21 @@ namespace Aurora
              * @param rhs The matrix to divide by.
              * @return The result of the division.
              */
-            friend mat3 operator /(float lhs, mat3 rhs);
+            friend mat3 operator /(float lhs, const mat3& rhs);
 
             /**
              * @brief Equality operator.
              * @param other The matrix to compare with.
              * @return True if matrices are equal, false otherwise.
              */
-            bool operator ==(mat3 other) const;
+            bool operator ==(const mat3& other) const;
 
             /**
              * @brief Inequality operator.
              * @param other The matrix to compare with.
              * @return True if matrices are not equal, false otherwise.
              */
-            bool operator !=(mat3 other) const;
+            bool operator !=(const mat3& other) const;
         };
     }
 }

@@ -274,6 +274,20 @@ namespace Aurora
 			bool operator !=(col other) const;
 
 			/**
+			 * @brief Gets the element at the specified index in the color.
+			 * @param idx The index of the element to retrieve.
+			 * @return The value at the specified index.
+			 */
+			float operator[](int idx) const;
+
+			/**
+			 * @brief Gets or sets the element at the specified index in the color.
+			 * @param idx The index of the element to modify.
+			 * @return Reference to the element at the specified index.
+			 */
+			float& operator[](int idx);
+
+			/**
 			 * @brief Implicit conversion operator to vec4.
 			 * @return The color represented as a vec4.
 			 */

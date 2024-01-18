@@ -3,13 +3,19 @@
 #include <stdexcept>
 #include "../INC/Aurora/Mathematics/math.h"
 #include "../INC/Aurora/Mathematics/vec2.h"
+#include "../INC/Aurora/Mathematics/vec3.h"
 #include "../INC/Aurora/Mathematics/angle.h"
+#include <vector>
 
 namespace Aurora::Mathematics
 {
     mat3 mat3::identity()
     {
-        return mat3(1, 0, 0, 0, 1, 0, 0, 0, 1);
+        return mat3(
+            1, 0, 0,
+            0, 1, 0,
+            0, 0, 1
+        );
     }
 
     float mat3::determinant() const
@@ -19,11 +25,40 @@ namespace Aurora::Mathematics
             m13() * (m21() * m32() - m22() * m31());
     }
 
+    float mat3::trace() const
+    {
+        return m11() + m22() + m33();
+    }
+
+    vec3 mat3::row(int r) const
+    {
+        return vec3(operator()(r, 0), operator()(r, 1), operator()(r, 2));
+    }
+
+    void mat3::row(int r, const vec3& value)
+    {
+        operator()(r, 0) = value.x;
+        operator()(r, 1) = value.y;
+        operator()(r, 2) = value.z;
+    }
+
+    vec3 mat3::col(int c) const
+    {
+        return vec3(operator()(0, c), operator()(1, c), operator()(2, c));
+    }
+
+    void mat3::col(int c, const vec3& value)
+    {
+        operator()(0, c) = value.x;
+        operator()(1, c) = value.y;
+        operator()(2, c) = value.z;
+    }
+
     mat3::mat3() : matrix3x3<float>() {}
 
-    mat3::mat3(float m11, float m12, float m13, float m21, float m22, float m23, float m31, float m32, float m33) : matrix3x3<float>(m11, m12, m13, m21, m22, m23, m31, m32, m33) {}
+    mat3::mat3(float m11, float m21, float m31, float m12, float m22, float m32, float m13, float m23, float m33) : matrix3x3<float>(m11, m21, m31, m12, m22, m32, m13, m23, m33) {}
 
-    bool mat3::approximately(mat3 value1, mat3 value2)
+    bool mat3::approximately(const mat3& value1, const mat3& value2)
     {
         for (int r = 0; r < rows(); r++)
         {
@@ -37,6 +72,39 @@ namespace Aurora::Mathematics
         }
 
         return true;
+    }
+
+    mat3 mat3::adjugate(mat3 value)
+    {
+        value.adjugate();
+        return value;
+    }
+
+    void mat3::adjugate()
+    {
+        float n11 = (m22() * m33() - m23() * m32());
+        float n12 = (m13() * m32() - m12() * m33());
+        float n13 = (m12() * m23() - m13() * m22());
+
+        float n21 = (m23() * m31() - m21() * m33());
+        float n22 = (m11() * m33() - m13() * m31());
+        float n23 = (m13() * m21() - m11() * m23());
+
+        float n31 = (m21() * m32() - m22() * m31());
+        float n32 = (m12() * m31() - m11() * m32());
+        float n33 = (m11() * m22() - m12() * m21());
+
+        m11() = n11;
+        m12() = n12;
+        m13() = n13;
+
+        m21() = n21;
+        m22() = n22;
+        m23() = n23;
+
+        m31() = n31;
+        m32() = n32;
+        m33() = n33;
     }
 
     mat3 mat3::invert(mat3 value)
@@ -68,17 +136,17 @@ namespace Aurora::Mathematics
         float n32 = (m12() * m31() - m11() * m32()) * i;
         float n33 = (m11() * m22() - m12() * m21()) * i;
 
-        m11(n11);
-        m12(n12);
-        m13(n13);
+        m11() = n11;
+        m12() = n12;
+        m13() = n13;
 
-        m21(n21);
-        m22(n22);
-        m23(n23);
+        m21() = n21;
+        m22() = n22;
+        m23() = n23;
 
-        m31(n31);
-        m32(n32);
-        m33(n33);
+        m31() = n31;
+        m32() = n32;
+        m33() = n33;
     }
 
     mat3 mat3::transpose(mat3 value)
@@ -97,7 +165,7 @@ namespace Aurora::Mathematics
         }
     }
 
-    mat3 mat3::createTranslation(vec2 position)
+    mat3 mat3::createTranslation(const vec2& position)
     {
         return mat3(
             1, 0, position.x,
@@ -105,7 +173,7 @@ namespace Aurora::Mathematics
             0, 0, 1);
     }
 
-    mat3 mat3::createScale(vec2 scale)
+    mat3 mat3::createScale(const vec2& scale)
     {
         return mat3(
             scale.x, 0, 0,
@@ -123,7 +191,7 @@ namespace Aurora::Mathematics
         );
     }
 
-    mat3 mat3::createRotation(angle rotation)
+    mat3 mat3::createRotation(const angle& rotation)
     {
         return mat3(
             angle::cos(rotation), angle::sin(rotation), 0,
@@ -132,7 +200,7 @@ namespace Aurora::Mathematics
         );
     }
 
-    mat3 mat3::createTransform(vec2 translation, float rotation, vec2 scaling)
+    mat3 mat3::createTransform(const vec2& translation, float rotation, const vec2& scaling)
     {
         mat3 t = createTranslation(translation);
         mat3 s = createScale(scaling);
@@ -141,7 +209,7 @@ namespace Aurora::Mathematics
         return t * s * r;
     }
 
-    mat3 mat3::createTransform(vec2 translation, angle rotation, vec2 scaling)
+    mat3 mat3::createTransform(const vec2& translation, const angle& rotation, const vec2& scaling)
     {
         mat3 t = createTranslation(translation);
         mat3 s = createScale(scaling);
@@ -155,7 +223,7 @@ namespace Aurora::Mathematics
         return createOrthographic(scale, aspectRatio, vec2());
     }
 
-    mat3 mat3::createOrthographic(float scale, float aspectRatio, vec2 offset)
+    mat3 mat3::createOrthographic(float scale, float aspectRatio, const vec2& offset)
     {
         float halfHeight = scale * 0.5f;
         float halfWidth = halfHeight * aspectRatio;
@@ -197,14 +265,14 @@ namespace Aurora::Mathematics
         return result;
     }
 
-    mat3 mat3::operator-(mat3 other) const
+    mat3 mat3::operator-(const mat3& other) const
     {
         mat3 result = *this;
         result -= other;
         return result;
     }
 
-    mat3& mat3::operator-=(mat3 other)
+    mat3& mat3::operator-=(const mat3& other)
     {
         for (int r = 0; r < rows(); r++)
         {
@@ -222,14 +290,14 @@ namespace Aurora::Mathematics
         return *this;
     }
 
-    mat3 mat3::operator+(mat3 other) const
+    mat3 mat3::operator+(const mat3& other) const
     {
         mat3 result = *this;
         result += other;
         return result;
     }
 
-    mat3& mat3::operator+=(mat3 other)
+    mat3& mat3::operator+=(const mat3& other)
     {
         for (int r = 0; r < rows(); r++)
         {
@@ -242,14 +310,14 @@ namespace Aurora::Mathematics
         return *this;
     }
 
-    mat3 mat3::operator*(mat3 other) const
+    mat3 mat3::operator*(const mat3& other) const
     {
         mat3 result = *this;
         result *= other;
         return result;
     }
 
-    mat3& mat3::operator*=(mat3 other)
+    mat3& mat3::operator*=(const mat3& other)
     {
         mat3 result;
 
@@ -286,7 +354,7 @@ namespace Aurora::Mathematics
     }
 
 
-    mat3 operator*(float lhs, mat3 rhs)
+    mat3 operator*(float lhs, const mat3& rhs)
     {
         mat3 result = mat3();
 
@@ -301,14 +369,14 @@ namespace Aurora::Mathematics
         return result;
     }
 
-    mat3 mat3::operator/(mat3 other) const
+    mat3 mat3::operator/(const mat3& other) const
     {
         mat3 result = *this;
         result /= other;
         return result;
     }
 
-    mat3& mat3::operator/=(mat3 other)
+    mat3& mat3::operator/=(const mat3& other)
     {
         return *this *= invert(other);
     }
@@ -333,7 +401,7 @@ namespace Aurora::Mathematics
         return *this;
     }
 
-    mat3 operator/(float lhs, mat3 rhs)
+    mat3 operator/(float lhs, const mat3& rhs)
     {
         mat3 result = mat3();
 
@@ -348,7 +416,7 @@ namespace Aurora::Mathematics
         return result;
     }
 
-    bool mat3::operator==(mat3 other) const
+    bool mat3::operator==(const mat3& other) const
     {
         for (int r = 0; r < rows(); r++)
         {
@@ -364,7 +432,7 @@ namespace Aurora::Mathematics
         return true;
     }
 
-    bool mat3::operator!=(mat3 other) const
+    bool mat3::operator!=(const mat3& other) const
     {
         return !(*this == other);
     }

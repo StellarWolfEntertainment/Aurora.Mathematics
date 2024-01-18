@@ -3,6 +3,8 @@
 #include <cmath>
 #include "../INC/Aurora/Mathematics/col.h"
 #include "../INC/Aurora/Mathematics/hsv.h"
+#include <stdexcept>
+#include <string>
 
 namespace Aurora::Mathematics
 {
@@ -103,6 +105,54 @@ namespace Aurora::Mathematics
 	bool col32::operator!=(col32 other) const
 	{
 		return !((*this) == other);
+	}
+
+	uint8_t col32::operator[](int idx) const
+	{
+		if (idx == 0)
+		{
+			return r;
+		}
+		else if (idx == 1)
+		{
+			return g;
+		}
+		else if (idx == 2)
+		{
+			return b;
+		}
+		else if (idx == 3)
+		{
+			return a;
+		}
+		else
+		{
+			throw std::out_of_range("The requested position does not exist in the vector (" + std::to_string(idx) + ").");
+		}
+	}
+
+	uint8_t& col32::operator[](int idx)
+	{
+		if (idx == 0)
+		{
+			return r;
+		}
+		else if (idx == 1)
+		{
+			return g;
+		}
+		else if (idx == 2)
+		{
+			return b;
+		}
+		else if (idx == 3)
+		{
+			return a;
+		}
+		else
+		{
+			throw std::out_of_range("The requested position does not exist in the vector (" + std::to_string(idx) + ").");
+		}
 	}
 
 	col32::operator col() const

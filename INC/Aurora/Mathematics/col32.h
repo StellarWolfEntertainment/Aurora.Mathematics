@@ -136,6 +136,20 @@ namespace Aurora
 			bool operator !=(col32 other) const;
 
 			/**
+			 * @brief Gets the element at the specified index in the color.
+			 * @param idx The index of the element to retrieve.
+			 * @return The value at the specified index.
+			 */
+			uint8_t operator[](int idx) const;
+
+			/**
+			 * @brief Gets or sets the element at the specified index in the color.
+			 * @param idx The index of the element to modify.
+			 * @return Reference to the element at the specified index.
+			 */
+			uint8_t& operator[](int idx);
+
+			/**
 			 * @brief Implicit conversion operator to col.
 			 * @return The color represented as a col.
 			 */

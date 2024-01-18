@@ -6,6 +6,8 @@
 #include "../INC/Aurora/Mathematics/col32.h"
 #include "../INC/Aurora/Mathematics/hsv.h"
 #include "../INC/Aurora/Mathematics/Quality.h"
+#include <stdexcept>
+#include <string>
 
 namespace Aurora::Mathematics
 {
@@ -266,6 +268,54 @@ namespace Aurora::Mathematics
 	bool col::operator!=(col other) const
 	{
 		return !(*this == other);
+	}
+
+	float col::operator[](int idx) const
+	{
+		if (idx == 0)
+		{
+			return r;
+		}
+		else if (idx == 1)
+		{
+			return g;
+		}
+		else if (idx == 2)
+		{
+			return b;
+		}
+		else if (idx == 3)
+		{
+			return a;
+		}
+		else
+		{
+			throw std::out_of_range("The requested position does not exist in the vector (" + std::to_string(idx) + ").");
+		}
+	}
+
+	float& col::operator[](int idx)
+	{
+		if (idx == 0)
+		{
+			return r;
+		}
+		else if (idx == 1)
+		{
+			return g;
+		}
+		else if (idx == 2)
+		{
+			return b;
+		}
+		else if (idx == 3)
+		{
+			return a;
+		}
+		else
+		{
+			throw std::out_of_range("The requested position does not exist in the vector (" + std::to_string(idx) + ").");
+		}
 	}
 
 	col::operator vec4() const

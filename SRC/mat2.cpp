@@ -2,6 +2,7 @@
 
 #include <stdexcept>
 #include "../INC/Aurora/Mathematics/math.h"
+#include "../INC/Aurora/Mathematics/vec2.h"
 
 namespace Aurora::Mathematics
 {
@@ -18,11 +19,38 @@ namespace Aurora::Mathematics
         return (m11() * m22()) - (m12() * m21());
     }
 
+    float mat2::trace() const
+    {
+        return m11() + m22();
+    }
+
+    vec2 mat2::row(int r) const
+    {
+        return vec2(operator()(r, 0), operator()(r, 1));
+    }
+
+    void mat2::row(int r, const vec2& value)
+    {
+        operator()(r, 0) = value.x;
+        operator()(r, 1) = value.y;
+    }
+
+    vec2 mat2::col(int c) const
+    {
+        return vec2(operator()(0, c), operator()(1, c));
+    }
+
+    void mat2::col(int c, const vec2& value)
+    {
+        operator()(0, c) = value.x;
+        operator()(1, c) = value.y;
+    }
+
     mat2::mat2() : matrix2x2<float>() {}
 
-    mat2::mat2(float m11, float m12, float m21, float m22) : matrix2x2<float>(m11, m12, m21, m22) {}
+    mat2::mat2(float m11, float m21, float m12, float m22) : matrix2x2<float>(m11, m21, m12, m22) {}
 
-    bool mat2::approximately(mat2 value1, mat2 value2)
+    bool mat2::approximately(const mat2& value1, const mat2& value2)
     {
         for (int r = 0; r < rows(); r++)
         {
@@ -36,6 +64,25 @@ namespace Aurora::Mathematics
         }
 
         return true;
+    }
+
+    mat2 mat2::adjugate(mat2 value)
+    {
+        value.adjugate();
+        return value;
+    }
+
+    void mat2::adjugate()
+    {
+        float n11 = m22();
+        float n12 = -m12();
+        float n21 = -m21();
+        float n22 = m11();
+
+        m11() = n11;
+        m12() = n12;
+        m21() = n21;
+        m22() = n22;
     }
 
     mat2 mat2::invert(mat2 value)
@@ -60,10 +107,10 @@ namespace Aurora::Mathematics
         float n21 = -m21() * i;
         float n22 = m11() * i;
 
-        m11(n11);
-        m12(n12);
-        m21(n21);
-        m22(n22);
+        m11() = n11;
+        m12() = n12;
+        m21() = n21;
+        m22() = n22;
     }
 
     mat2 mat2::transpose(mat2 value)
@@ -107,14 +154,14 @@ namespace Aurora::Mathematics
         return result;
     }
 
-    mat2 mat2::operator-(mat2 other) const
+    mat2 mat2::operator-(const mat2& other) const
     {
         mat2 result = *this;
         result -= other;
         return result;
     }
 
-    mat2& mat2::operator-=(mat2 other)
+    mat2& mat2::operator-=(const mat2& other)
     {
         for (int r = 0; r < rows(); r++)
         {
@@ -132,14 +179,14 @@ namespace Aurora::Mathematics
         return *this;
     }
 
-    mat2 mat2::operator+(mat2 other) const
+    mat2 mat2::operator+(const mat2& other) const
     {
         mat2 result = *this;
         result += other;
         return result;
     }
 
-    mat2& mat2::operator+=(mat2 other)
+    mat2& mat2::operator+=(const mat2& other)
     {
         for (int r = 0; r < rows(); r++)
         {
@@ -152,14 +199,14 @@ namespace Aurora::Mathematics
         return *this;
     }
 
-    mat2 mat2::operator*(mat2 other) const
+    mat2 mat2::operator*( const mat2& other) const
     {
         mat2 result = *this;
         result *= other;
         return result;
     }
 
-    mat2& mat2::operator*=(mat2 other)
+    mat2& mat2::operator*=( const mat2& other)
     {
         mat2 result;
 
@@ -196,7 +243,7 @@ namespace Aurora::Mathematics
     }
 
 
-    mat2 operator*(float lhs, mat2 rhs)
+    mat2 operator*(float lhs, const mat2& rhs)
     {
         mat2 result = mat2();
 
@@ -211,14 +258,14 @@ namespace Aurora::Mathematics
         return result;
     }
 
-    mat2 mat2::operator/(mat2 other) const
+    mat2 mat2::operator/( const mat2& other) const
     {
         mat2 result = *this;
         result /= other;
         return result;
     }
 
-    mat2& mat2::operator/=(mat2 other)
+    mat2& mat2::operator/=( const mat2& other)
     {
         return *this *= invert(other);
     }
@@ -243,7 +290,7 @@ namespace Aurora::Mathematics
         return *this;
     }
 
-    mat2 operator/(float lhs, mat2 rhs)
+    mat2 operator/(float lhs, const mat2& rhs)
     {
         mat2 result = mat2();
 
@@ -258,7 +305,7 @@ namespace Aurora::Mathematics
         return result;
     }
 
-    bool mat2::operator==(mat2 other) const
+    bool mat2::operator==( const mat2& other) const
     {
         for (int r = 0; r < rows(); r++)
         {
@@ -274,7 +321,7 @@ namespace Aurora::Mathematics
         return true;
     }
 
-    bool mat2::operator!=(mat2 other) const
+    bool mat2::operator!=( const mat2& other) const
     {
         return !(*this == other);
     }

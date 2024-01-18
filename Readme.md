@@ -39,6 +39,7 @@ Download the latest release of the Aurora Mathematics Library from the [Releases
 ### 2. Link the Library
 
 Extract the downloaded files and locate the static library file (e.g., `Aurora.Mathematics.a` on Unix-like systems or `Aurora.Mathematics.lib` on Windows). Add the library to your project and ensure it is correctly linked during the build process.
+**Note:** that at this time the only currently available 'compiled' version of the library is for Windows.
 
 ### 3. Include Headers
 
